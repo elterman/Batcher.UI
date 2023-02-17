@@ -1,0 +1,16 @@
+{
+  "window.title": "${dirty}${rootName} • ${activeEditorShort}",
+  "workbench.colorCustomizations": {
+    "titleBar.activeBackground": "#3C856180",
+    "tab.inactiveBackground": "#3C856180",
+    "tab.activeBackground": "#1E1E1E",
+    "tab.activeBorderTop": "#FFFCA6",
+  },
+  "python.pythonPath": "C:\\Users\\aelterma\\AppData\\Local\\Programs\\Python\\Python39\\python.exe",
+  "terminal.integrated.cursorBlinking": true,
+  "vscode_custom_css.imports": ["file:///C:/git/Cloud-Drive/vs-code-custom.css"],
+  "vscode_custom_css.policy": true,
+  "python.linting.enabled": true,
+  "python.linting.pylintPath": "api\\venv\\scripts\\pylint",
+  "tabsort.sortByFullPath": false
+}

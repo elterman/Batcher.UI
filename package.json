@@ -1,0 +1,48 @@
+{
+  "name": "batcher",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@azure/msal-browser": "^2.5.2",
+    "@microsoft/microsoft-graph-client": "^2.1.1",
+    "copy-text-to-clipboard": "^2.2.0",
+    "cytoscape": "^3.18.1",
+    "cytoscape-cola": "^2.4.0",
+    "cytoscape-cose-bilkent": "^4.1.0",
+    "cytoscape-dagre": "^2.3.2",
+    "cytoscape-euler": "^1.2.2",
+    "cytoscape-klay": "^3.1.4",
+    "cytoscape-spread": "^3.0.0",
+    "dayjs": "^1.10.4",
+    "lodash": "^4.17.21",
+    "react": "^17.0.2",
+    "react-cytoscapejs": "^1.2.1",
+    "react-dom": "^17.0.1",
+    "react-scripts": "4.0.3",
+    "react-spring": "^9.2.4",
+    "recoil": "^0.3.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "start-api": "cd api && venv\\scripts\\flask run --no-debugger",
+    "build": "react-scripts build",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

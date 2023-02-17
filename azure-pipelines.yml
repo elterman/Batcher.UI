@@ -1,0 +1,104 @@
+# Node.js with React
+# Build a Node.js project that uses React.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+trigger:
+  - master
+  
+pool: 'GMO Linux OnPrem'
+  
+stages:
+- stage: build
+  displayName: 'Build react app'
+  jobs:
+  - job: build
+    displayName: 'Build'
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '14.x'
+      displayName: 'Install Node.js'
+
+    - script: |
+        npm install
+        npm run build
+      displayName: 'npm install and build'
+
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Spa artifact'
+      inputs:
+        targetPath: $(build.sourcesdirectory)/build
+        artifact: 'spa'
+        publishLocation: pipeline
+    
+- stage: release_dev_eu2
+  displayName: 'Release to DEV EU2'
+  jobs:
+  - deployment: dev_eu2
+    environment: bad-dev-eu2
+    variables:
+      - group: batcher-ui-release-dev
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - pwsh: |
+              Move-Item "$(Pipeline.Workspace)/spa/config.release.js" "$(Pipeline.Workspace)/spa/config.js" -force -verbose
+            displayName: 'Overwrite config.js with tokenized config.js'
+
+          - pwsh: |
+              $content = $(Get-Content $(Pipeline.Workspace)/spa/config.js)
+
+              $content = $content.Replace('#{clientId}#', "$(clientId)").Replace('#{redirectUri}#', "$(redirectUri)").Replace('#{resourceUri}#', "$(resourceUri)").Replace('#{resourceScope}#', "$(resourceScope)")
+
+              Set-Content $(Pipeline.Workspace)/spa/config.js -Value $content -Force
+            displayName: 'Replace config.js tokens with release variables'
+
+          - task: AzureCLI@2
+            displayName: 'Copy website files'
+            inputs:
+              azureSubscription: 'GMO BAD NonPrd Deployment Account'
+              scriptType: pscore
+              scriptLocation: inlineScript
+              inlineScript: |
+               $key = az storage account keys list --account-name bad$(Environment)spaeu2 --query [0].value --output tsv
+               az storage blob delete-batch --account-name bad$(Environment)spaeu2 --account-key $key --source `$web
+               
+               az storage blob upload-batch --account-name bad$(Environment)spaeu2 --account-key $key --source $(Pipeline.Workspace)/spa --destination `$web
+
+- stage: release_prd_eu2
+  displayName: 'Release to PRD EU2'
+  jobs:
+  - deployment: prd_eu2
+    environment: bad-prd-eu2
+    variables:
+      - group: batcher-ui-release-prd
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - pwsh: |
+              Move-Item "$(Pipeline.Workspace)/spa/config.release.js" "$(Pipeline.Workspace)/spa/config.js" -force -verbose
+            displayName: 'Overwrite config.js with tokenized config.js'
+
+          - pwsh: |
+              $content = $(Get-Content $(Pipeline.Workspace)/spa/config.js)
+
+              $content = $content.Replace('#{clientId}#', "$(clientId)").Replace('#{redirectUri}#', "$(redirectUri)").Replace('#{resourceUri}#', "$(resourceUri)").Replace('#{resourceScope}#', "$(resourceScope)")
+
+              Set-Content $(Pipeline.Workspace)/spa/config.js -Value $content -Force
+            displayName: 'Replace config.js tokens with release variables'
+
+          - task: AzureCLI@2
+            displayName: 'Copy website files'
+            inputs:
+              azureSubscription: 'GMO BAD Prd Deployment Account'
+              scriptType: pscore
+              scriptLocation: inlineScript
+              inlineScript: |
+                $key = az storage account keys list --account-name bad$(Environment)spaeu2 --query [0].value --output tsv
+                az storage blob delete-batch --account-name bad$(Environment)spaeu2 --account-key $key --source `$web
+                
+                az storage blob upload-batch --account-name bad$(Environment)spaeu2 --account-key $key --source $(Pipeline.Workspace)/spa --destination `$web
+              
